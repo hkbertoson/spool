@@ -10,10 +10,15 @@ import {
 } from "@tanstack/react-router";
 
 import { useAction, useViewer } from "../components/hooks";
-import { button } from "../components/ui";
+import { button, tag } from "../components/ui";
 import { authClient } from "../lib/auth-client";
 import { fetchViewer } from "../lib/requests.functions";
 import appCss from "../styles.css?url";
+
+const cubePath = "M8 1 15 5v6l-7 4-7-4V5zM1 5l7 4 7-4M8 9v6";
+
+const navTab =
+  "rounded-md border-2 border-transparent px-2.5 py-1 font-bold text-fg no-underline hover:border-ink data-[status=active]:border-ink data-[status=active]:bg-fg data-[status=active]:text-bg";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -23,10 +28,16 @@ export const Route = createRootRoute({
       { title: "Print Queue" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
       {
         rel: "icon",
-        href: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 1 15 5v6l-7 4-7-4V5z' fill='%23f28c28'/></svg>",
+        href: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='${cubePath}' fill='%23ff7a2e' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'/></svg>`,
       },
     ],
   }),
@@ -52,38 +63,46 @@ function RootDocument({ children }: { children: ReactNode }) {
 
 function Layout() {
   const { user } = useViewer();
+
   return (
     <>
-      <header className="flex flex-wrap items-center gap-5 border-b border-line bg-surface px-4 py-2.5">
-        <Link to="/" className="font-semibold text-fg no-underline">
-          Print Queue
-        </Link>
-        {user && (
-          <>
-            <nav className="flex gap-4">
-              <Link
-                to="/"
-                activeOptions={{ exact: true }}
-                className="text-muted no-underline data-[status=active]:font-semibold data-[status=active]:text-fg"
-              >
-                Board
+      <header className="border-b-2 border-ink bg-surface">
+        {/* Below lg the tabs and account drop to a second row so the logo and button share the first. */}
+        <div className="mx-auto flex max-w-300 flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:gap-x-6">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-base font-black text-fg font-stretch-expanded no-underline sm:text-xl"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              className="size-6 fill-accent stroke-ink sm:size-7"
+              strokeWidth={1.2}
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d={cubePath} />
+            </svg>
+            Print Queue
+          </Link>
+          {user && (
+            <>
+              <nav className="flex gap-1 max-lg:order-last">
+                <Link to="/" activeOptions={{ exact: true }} className={navTab}>
+                  Board
+                </Link>
+                <Link to="/history" activeOptions={{ includeSearch: false }} className={navTab}>
+                  History
+                </Link>
+              </nav>
+              <Account />
+              <Link to="/new" className={`${button.primary} max-lg:ml-auto`}>
+                Request a print
               </Link>
-              <Link
-                to="/history"
-                activeOptions={{ includeSearch: false }}
-                className="text-muted no-underline data-[status=active]:font-semibold data-[status=active]:text-fg"
-              >
-                History
-              </Link>
-            </nav>
-            <Account />
-            <Link to="/new" className={button.primary}>
-              Request a print
-            </Link>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </header>
-      <main className="mx-auto max-w-300 px-4 pt-6 pb-16">
+      <main className="mx-auto max-w-300 px-4 pt-8 pb-16">
         <Outlet />
       </main>
     </>
@@ -100,9 +119,9 @@ function Account() {
   };
 
   return (
-    <span className="ml-auto text-[0.9rem]">
-      {user?.name}
-      {owner && <span className="text-muted"> · printer owner</span>} ·{" "}
+    <span className="ml-auto flex flex-wrap items-center gap-x-2 gap-y-1 text-sm max-lg:order-last">
+      <span className="font-bold max-sm:hidden">{user?.name}</span>
+      {owner && <span className={tag.owner}>Printer owner</span>}
       <button type="button" className={button.link} disabled={pending} onClick={signOut}>
         Sign out
       </button>

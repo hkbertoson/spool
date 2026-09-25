@@ -41,7 +41,7 @@ function NewRequest() {
         </label>
         <label>
           Link to the model{" "}
-          <span className="text-muted">(Printables, MakerWorld, Thingiverse…)</span>
+          <span className="font-normal text-muted">(Printables, MakerWorld, Thingiverse…)</span>
           <input
             name="link"
             type="url"
@@ -50,7 +50,8 @@ function NewRequest() {
           />
         </label>
         <label>
-          Or describe your idea <span className="text-muted">(and any notes for the printer)</span>
+          Or describe your idea{" "}
+          <span className="font-normal text-muted">(and any notes for the printer)</span>
           <textarea
             name="details"
             rows={4}
@@ -58,7 +59,7 @@ function NewRequest() {
             placeholder="A little stand that holds my phone upright next to the monitor…"
           />
         </label>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           <label>
             Material
             <select name="material" defaultValue="Any">

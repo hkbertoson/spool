@@ -9,7 +9,7 @@ import type { Status } from "../../../lib/workflow";
 import { Pending } from "../../../components/Feedback";
 import { useAction, useViewer } from "../../../components/hooks";
 import { StatusBadge } from "../../../components/StatusBadge";
-import { button, fieldError, form, panel } from "../../../components/ui";
+import { button, fieldError, form, panel, tag } from "../../../components/ui";
 import { formatTime, linkHost } from "../../../lib/format";
 import {
   addComment,
@@ -49,28 +49,30 @@ function RequestPage() {
       <p>
         <Link to="/">← Board</Link>
       </p>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+      <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="m-0">{request.title}</h1>
         <StatusBadge status={request.status} />
       </div>
 
       {request.status === "declined" && (
-        <p className="rounded-md border-l-3 border-l-danger bg-surface px-3.5 py-2.5">
+        <p className="rounded-lg border-2 border-ink bg-declined px-4 py-3 text-ink shadow-extrude-sm">
           <strong>Declined:</strong> {request.declineReason}
         </p>
       )}
 
-      <div className="grid items-start gap-4 md:grid-cols-[2fr_1fr]">
-        <section className={panel}>
-          <dl className="mb-4 grid grid-cols-[max-content_1fr] gap-x-5 gap-y-1.5 [&_dd]:wrap-anywhere [&_dt]:text-muted">
+      <div className="grid items-start gap-6 md:grid-cols-3">
+        <section className={`${panel} md:col-span-2`}>
+          <dl className="m-0 grid grid-cols-label gap-x-6 gap-y-2 [&_dd]:wrap-anywhere [&_dt]:font-bold [&_dt]:text-muted">
             <dt>For</dt>
             <dd>
               {request.requesterName}
               {mine && <span className="text-muted"> (you)</span>}
             </dd>
             <dt>Material</dt>
-            <dd>
-              {request.material} · {request.color} · ×{request.quantity}
+            <dd className="flex flex-wrap items-center gap-1.5">
+              <span className={tag.plain}>{request.material}</span>
+              <span className={tag.plain}>{request.color}</span>
+              <span className={tag.inverse}>×{request.quantity}</span>
             </dd>
             {request.link && (
               <>
@@ -94,12 +96,12 @@ function RequestPage() {
 
         <section className={panel}>
           <h2 className="mt-0">Progress</h2>
-          <ol className="m-0 grid list-decimal gap-1.5 pl-[18px]">
+          <ol className="m-0 grid list-decimal gap-3 pl-5 marker:font-bold">
             {events.map((event, i) => (
               <li key={i}>
-                <StatusBadge status={event.status} />{" "}
-                <span className="text-[0.82rem] text-muted">
-                  {formatTime(event.at)} · {event.actorName}
+                <StatusBadge status={event.status} />
+                <span className="mt-1 block text-xs text-muted">
+                  {event.actorName}, {formatTime(event.at)}
                 </span>
               </li>
             ))}
@@ -113,18 +115,18 @@ function RequestPage() {
           thread.length === 0 ? (
             <p className="text-muted">No comments yet.</p>
           ) : (
-            <ol className="my-4 grid list-none gap-2.5 p-0">
+            <ol className="my-4 grid max-w-160 list-none gap-3 p-0">
               {thread.map((comment, i) => (
                 <li
                   key={i}
-                  className={`rounded-[10px] border border-line bg-surface px-3.5 py-2.5 ${comment.fromOwner ? "border-l-3 border-l-accent" : ""}`}
+                  className="rounded-lg border-2 border-ink bg-surface px-4 py-3 shadow-extrude-sm"
                 >
-                  <div className="text-[0.82rem]">
-                    <strong>{comment.authorName}</strong>{" "}
-                    {comment.fromOwner && <span className="text-muted">printer owner · </span>}
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                    <strong>{comment.authorName}</strong>
+                    {comment.fromOwner && <span className={tag.owner}>Printer owner</span>}
                     <span className="text-muted">{formatTime(comment.at)}</span>
                   </div>
-                  <p className="m-0 whitespace-pre-wrap">{comment.body}</p>
+                  <p className="mt-1.5 mb-0 whitespace-pre-wrap">{comment.body}</p>
                 </li>
               ))}
             </ol>
@@ -156,8 +158,8 @@ function Actions({ id, status, mine }: { id: string; status: Status; mine: boole
   if (!ownerActions && !withdrawable) return null;
 
   return (
-    <div className="mt-4 grid gap-2.5 border-t border-line pt-4">
-      <div className="flex flex-wrap items-center gap-2.5">
+    <div className="mt-5 grid gap-3 border-t-2 border-ink pt-5">
+      <div className="flex flex-wrap items-center gap-3">
         {owner && nextLabel && (
           <button
             type="button"
@@ -190,9 +192,9 @@ function Actions({ id, status, mine }: { id: string; status: Status; mine: boole
         )}
       </div>
       {declining && (
-        <form className="flex flex-wrap gap-2" onSubmit={onDecline}>
+        <form className="flex flex-wrap items-center gap-3" onSubmit={onDecline}>
           <input
-            className="flex-[1_1_260px]"
+            className="grow basis-64"
             name="reason"
             required
             maxLength={500}
@@ -225,7 +227,7 @@ function CommentForm({ id }: { id: string }) {
   };
 
   return (
-    <form className={`${form} mt-2.5 max-w-160`} onSubmit={onSubmit}>
+    <form className={`${form} mt-3 max-w-160`} onSubmit={onSubmit}>
       <textarea
         name="body"
         rows={2}

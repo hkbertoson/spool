@@ -7,7 +7,7 @@ import { startTransition, useOptimistic, useRef, useState } from "react";
 import type { ActiveStatus } from "../../lib/workflow";
 
 import { useAction, useViewer } from "../../components/hooks";
-import { fieldError } from "../../components/ui";
+import { fieldError, statusFill, tag } from "../../components/ui";
 import { formatTime, linkHost } from "../../lib/format";
 import { fetchBoard, moveRequest } from "../../lib/requests.functions";
 import { statusLabels } from "../../lib/workflow";
@@ -18,11 +18,6 @@ export const Route = createFileRoute("/_app/")({
   loader: () => fetchBoard(),
   component: Board,
 });
-
-const cardAccent: Partial<Record<ActiveStatus, string>> = {
-  printing: "border-l-3 border-l-accent",
-  ready: "border-l-3 border-l-ok",
-};
 
 type Move = { id: string; from: ActiveStatus; to: ActiveStatus };
 
@@ -75,27 +70,34 @@ function Board() {
 
   return (
     <>
-      {error && <p className={fieldError}>{error}</p>}
-      <div className="grid grid-cols-[repeat(4,minmax(220px,1fr))] gap-3.5 overflow-x-auto">
+      {error && <p className={`${fieldError} mb-6`}>{error}</p>}
+      {/* The padding leaves room for extrusions and the drop outline inside the scroll box. */}
+      <div className="-m-3 grid grid-cols-board gap-4 overflow-x-auto p-3">
         {board.map(({ status, requests }) => (
           <section
             key={status}
-            className={`flex min-h-50 flex-col gap-2.5 rounded-xl bg-sunken p-3 ${over === status ? "outline-2 -outline-offset-2 outline-accent outline-dashed" : ""}`}
+            className={`flex min-h-50 flex-col gap-3 rounded-lg border-2 border-ink p-3 text-ink shadow-extrude ${statusFill[status]} ${over === status ? "outline-3 outline-offset-4 outline-fg outline-dashed" : ""}`}
             onDragOver={owner ? (event) => onDragOver(event, status) : undefined}
             onDragLeave={owner ? onDragLeave : undefined}
             onDrop={owner ? (event) => onDrop(event, status) : undefined}
           >
-            <h2 className="mt-0 mb-1 flex justify-between text-[0.95rem]">
+            <h2 className="m-0 flex items-center justify-between gap-2 text-lg">
               {statusLabels[status]}{" "}
-              <span className="font-normal text-muted">{requests.length}</span>
+              <span className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-ink bg-surface text-sm text-fg">
+                {requests.length}
+              </span>
             </h2>
-            {requests.length === 0 && <p className="m-0 text-[0.85rem] text-muted">Nothing here</p>}
+            {requests.length === 0 && (
+              <p className="m-0 rounded-md border-2 border-dashed border-ink/40 p-3 text-center text-sm font-semibold text-ink/70">
+                Nothing here
+              </p>
+            )}
             {requests.map((request) => (
               <Link
                 key={request.id}
                 to="/requests/$id"
                 params={{ id: request.id }}
-                className={`grid gap-0.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-[0.9rem] text-inherit no-underline hover:border-accent ${cardAccent[status] ?? ""} ${owner ? "cursor-grab" : ""}`}
+                className={`grid gap-1.5 rounded-md border-2 border-ink bg-surface p-3 text-sm font-normal text-fg no-underline shadow-extrude-sm transition duration-100 hover:-translate-0.5 hover:shadow-extrude motion-reduce:transition-none ${owner ? "cursor-grab" : ""}`}
                 draggable={owner}
                 onDragStart={(event) => {
                   dragging.current = { id: request.id, from: status };
@@ -106,18 +108,19 @@ function Board() {
                   setOver(undefined);
                 }}
               >
-                <strong>{request.title}</strong>
-                <span>
+                <strong className="text-base leading-snug">{request.title}</strong>
+                <span className="flex flex-wrap items-center gap-1.5">
                   {request.requesterName}
-                  {request.quantity > 1 && ` · ×${request.quantity}`}
+                  {request.quantity > 1 && <span className={tag.inverse}>×{request.quantity}</span>}
                 </span>
-                <span className="text-muted">
-                  {request.material} · {request.color}
+                <span className="flex flex-wrap gap-1.5">
+                  <span className={tag.plain}>{request.material}</span>
+                  <span className={tag.plain}>{request.color}</span>
                 </span>
                 <span className="line-clamp-2 text-muted">
                   {request.link ? linkHost(request.link) : request.details}
                 </span>
-                <time className="text-[0.82rem] text-muted" dateTime={request.createdAt}>
+                <time className="text-xs text-muted" dateTime={request.createdAt}>
                   {formatTime(request.createdAt)}
                 </time>
               </Link>

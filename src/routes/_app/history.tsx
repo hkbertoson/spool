@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link, createFileRoute, stripSearchParams, useNavigate } from "@tanstack/react-router";
 
 import { StatusBadge } from "../../components/StatusBadge";
-import { button, panel } from "../../components/ui";
+import { button, panel, tag } from "../../components/ui";
 import { formatTime, linkHost, plural } from "../../lib/format";
 import { fetchHistory } from "../../lib/requests.functions";
 import { archivedStatuses, historySearchSchema, materials, statusLabels } from "../../lib/workflow";
@@ -28,44 +28,49 @@ function History() {
     <>
       <h1>History</h1>
       <Filters />
-      <p className="text-muted">{plural(requests.length, "request")}</p>
+      <p className="text-sm font-semibold text-muted">{plural(requests.length, "request")}</p>
       {requests.length === 0 ? (
         <p className={panel}>Nothing matches these filters.</p>
       ) : (
-        <table className="block w-full overflow-x-auto rounded-[10px] border border-line bg-surface [&_:is(th,td)]:border-b [&_:is(th,td)]:border-line [&_:is(th,td)]:px-3 [&_:is(th,td)]:py-2 [&_:is(th,td)]:text-left [&_:is(th,td)]:text-[0.92rem] [&_th]:font-medium [&_th]:text-muted">
-          <thead className="table w-full">
-            <tr>
-              <th>Print</th>
-              <th>For</th>
-              <th>Material</th>
-              <th>Source</th>
-              <th>Outcome</th>
-              <th>Closed</th>
-            </tr>
-          </thead>
-          <tbody className="table w-full">
-            {requests.map((request) => (
-              <tr key={request.id}>
-                <td>
-                  <Link to="/requests/$id" params={{ id: request.id }}>
-                    {request.title}
-                  </Link>
-                </td>
-                <td>{request.requesterName}</td>
-                <td>
-                  {request.material} · {request.color}
-                </td>
-                <td className="whitespace-nowrap text-muted">
-                  {request.link ? linkHost(request.link) : "Idea"}
-                </td>
-                <td>
-                  <StatusBadge status={request.status} />
-                </td>
-                <td className="whitespace-nowrap">{formatTime(request.updatedAt)}</td>
+        <div className="overflow-x-auto rounded-lg border-2 border-ink bg-surface shadow-extrude">
+          <table className="w-full text-sm [&_:is(th,td)]:px-4 [&_:is(th,td)]:py-3 [&_:is(th,td)]:text-left">
+            <thead className="bg-fg text-bg">
+              <tr>
+                <th>Print</th>
+                <th>For</th>
+                <th>Material</th>
+                <th>Source</th>
+                <th>Outcome</th>
+                <th>Closed</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y-2 divide-ink">
+              {requests.map((request) => (
+                <tr key={request.id}>
+                  <td>
+                    <Link to="/requests/$id" params={{ id: request.id }}>
+                      {request.title}
+                    </Link>
+                  </td>
+                  <td>{request.requesterName}</td>
+                  <td>
+                    <span className="flex gap-1.5">
+                      <span className={tag.plain}>{request.material}</span>
+                      <span className={tag.plain}>{request.color}</span>
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap text-muted">
+                    {request.link ? linkHost(request.link) : "Idea"}
+                  </td>
+                  <td>
+                    <StatusBadge status={request.status} />
+                  </td>
+                  <td className="whitespace-nowrap">{formatTime(request.updatedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
@@ -88,7 +93,7 @@ function Filters() {
   // method="get" keeps filtering functional before hydration.
   return (
     <form
-      className="my-2 flex flex-wrap gap-2"
+      className="my-4 flex flex-wrap gap-2"
       method="get"
       onSubmit={onSubmit}
       key={JSON.stringify(search)}
@@ -134,7 +139,7 @@ function Filters() {
       <input
         name="q"
         type="search"
-        className="flex-[1_1_180px]"
+        className="grow basis-44"
         placeholder="Search print or person"
         defaultValue={search.q}
       />

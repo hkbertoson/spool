@@ -1,30 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #f5f4f1;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #e9ebef;
   --color-surface: #ffffff;
-  --color-sunken: #ecebe7;
-  --color-fg: #1d1d1f;
-  --color-muted: #6b6b70;
-  --color-line: #e1dfda;
-  --color-accent: #d9731a;
-  --color-accent-fg: #ffffff;
-  --color-danger: #b3261e;
-  --color-ok: #2e7d32;
+  --color-fg: #000000;
+  --color-muted: #4f5059;
+  --color-ink: #000000;
+  --color-accent: #ff7a2e;
+  --color-danger: #c4271c;
+
+  /* One filament color per status; text on them is always ink. */
+  --color-requested: #ffd43b;
+  --color-accepted: #7cc8ff;
+  --color-printing: var(--color-accent);
+  --color-ready: #8fe35b;
+  --color-done: #d9f5c4;
+  --color-declined: #ff6b8b;
+  --color-withdrawn: #b4b5bd;
+
+  /* Stacked 1px steps read as a solid extruded block, not a floating card. */
+  --shadow-extrude-sm: 1px 1px 0 var(--color-ink), 2px 2px 0 var(--color-ink);
+  --shadow-extrude:
+    1px 1px 0 var(--color-ink), 2px 2px 0 var(--color-ink), 3px 3px 0 var(--color-ink),
+    4px 4px 0 var(--color-ink);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #141416;
-    --color-surface: #1e1e21;
-    --color-sunken: #19191b;
-    --color-fg: #ececee;
-    --color-muted: #9a9aa1;
-    --color-line: #2e2e33;
-    --color-accent: #f28c28;
-    --color-accent-fg: #1a1206;
+    --color-bg: #1d1e23;
+    --color-surface: #2b2c33;
+    --color-fg: #f4f4f6;
+    --color-muted: #b0b1ba;
     --color-danger: #ff8a80;
   }
+}
+
+@utility grid-cols-board {
+  grid-template-columns: repeat(4, minmax(14rem, 1fr));
+}
+
+@utility grid-cols-label {
+  grid-template-columns: max-content 1fr;
 }
 
 @layer base {
@@ -34,14 +52,17 @@
   body {
     @apply bg-bg text-fg;
   }
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-fg;
+  }
   a {
-    @apply text-accent underline;
+    @apply font-semibold text-fg underline decoration-accent decoration-2 underline-offset-3 hover:decoration-4;
   }
   h1 {
-    @apply mb-3 text-[1.6rem] font-bold;
+    @apply mb-5 text-3xl leading-tight font-extrabold text-balance font-stretch-expanded sm:text-4xl;
   }
   h2 {
-    @apply mt-7 mb-2.5 text-[1.1rem] font-bold;
+    @apply mt-8 mb-3 text-xl font-extrabold font-stretch-expanded;
   }
   p {
     @apply my-4;
@@ -49,6 +70,11 @@
   input,
   select,
   textarea {
-    @apply rounded-lg border border-line bg-surface px-2.5 py-1.5 text-fg;
+    @apply rounded-md border-2 border-ink bg-surface px-3 py-2 text-base font-normal text-fg placeholder:text-muted;
+  }
+  /* Matches the button height; Chrome sizes <select> from font metrics, not line-height. */
+  input,
+  select {
+    @apply h-11;
   }
 }

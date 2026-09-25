@@ -25,7 +25,7 @@ export function AuthForm({
     run(() => onSubmit(new FormData(event.currentTarget)));
   };
   return (
-    <form className={`${form} max-w-85`} onSubmit={handle}>
+    <form className={`${form} max-w-96`} onSubmit={handle}>
       {children}
       {error && <p className={fieldError}>{error}</p>}
       <button type="submit" className={button.primary} disabled={pending}>
