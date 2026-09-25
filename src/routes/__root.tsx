@@ -25,7 +25,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Print Queue" },
+      { title: "Spool" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -71,18 +71,18 @@ function Layout() {
         <div className="mx-auto flex max-w-300 flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:gap-x-6">
           <Link
             to="/"
-            className="flex items-center gap-2 text-base font-black text-fg font-stretch-expanded no-underline sm:text-xl"
+            className="flex items-center gap-2 text-xl font-black text-fg font-stretch-expanded no-underline"
           >
             <svg
               viewBox="0 0 16 16"
-              className="size-6 fill-accent stroke-ink sm:size-7"
+              className="size-7 fill-accent stroke-ink"
               strokeWidth={1.2}
               strokeLinejoin="round"
               aria-hidden="true"
             >
               <path d={cubePath} />
             </svg>
-            Print Queue
+            Spool
           </Link>
           {user && (
             <>

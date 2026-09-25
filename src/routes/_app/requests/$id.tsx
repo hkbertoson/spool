@@ -32,9 +32,7 @@ export const Route = createFileRoute("/_app/requests/$id")({
     return { request, events, comments };
   },
   head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData ? `${loaderData.request.title} · Print Queue` : "Request · Print Queue" },
-    ],
+    meta: [{ title: loaderData ? `${loaderData.request.title} · Spool` : "Request · Spool" }],
   }),
   component: RequestPage,
 });

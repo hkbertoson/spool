@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_app/history")({
   search: { middlewares: [stripSearchParams({ period: "all" })] },
   loaderDeps: ({ search: { status, material, q, period } }) => ({ status, material, q, period }),
   loader: ({ deps }) => fetchHistory({ data: deps }),
-  head: () => ({ meta: [{ title: "History · Print Queue" }] }),
+  head: () => ({ meta: [{ title: "History · Spool" }] }),
   component: History,
 });
 

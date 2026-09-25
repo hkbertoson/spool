@@ -6,7 +6,7 @@ import { redirectSchema } from "../../lib/workflow";
 
 export const Route = createFileRoute("/_landing/signup")({
   validateSearch: redirectSchema,
-  head: () => ({ meta: [{ title: "Create account · Print Queue" }] }),
+  head: () => ({ meta: [{ title: "Create account · Spool" }] }),
   component: Signup,
 });
 

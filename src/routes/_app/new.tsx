@@ -11,7 +11,7 @@ import { materials } from "../../lib/workflow";
 export const Route = createFileRoute("/_app/new")({
   // Full SSR: a static form; the requester comes from the session.
   ssr: true,
-  head: () => ({ meta: [{ title: "Request a print · Print Queue" }] }),
+  head: () => ({ meta: [{ title: "Request a print · Spool" }] }),
   component: NewRequest,
 });
 
