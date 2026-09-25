@@ -1,0 +1,8 @@
+node_modules
+.output
+.tanstack
+dist
+.wrangler
+.dev.vars
+.DS_Store
+.DS_Store

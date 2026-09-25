@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "print-queue",
+  "account_id": "8dd478875c821f95cef502ecad3d027b", // Cyber Logical Development
+  "compatibility_date": "2026-09-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": { "enabled": true },
+  // Overridden to localhost in .dev.vars so local sign-in passes Better Auth's origin check.
+  "vars": { "BETTER_AUTH_URL": "https://print-queue.hunterkylebertoson.workers.dev" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "print-queue",
+      "database_id": "df296be2-0f10-46df-af38-26c6842701c6",
+      "migrations_dir": "migrations",
+    },
+  ],
+  // Secrets (wrangler secret put): BETTER_AUTH_SECRET, SIGNUP_CODE
+}
