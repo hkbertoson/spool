@@ -10,11 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LandingRouteImport } from './routes/_landing'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppHistoryRouteImport } from './routes/_app/history'
 import { Route as AppNewRouteImport } from './routes/_app/new'
+import { Route as LandingLoginRouteImport } from './routes/_landing/login'
+import { Route as LandingSignupRouteImport } from './routes/_landing/signup'
 import { Route as AppRequestsIdRouteImport } from './routes/_app/requests/$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -22,14 +23,8 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
+const LandingRoute = LandingRouteImport.update({
+  id: '/_landing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -47,6 +42,16 @@ const AppNewRoute = AppNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AppRoute,
 } as any)
+const LandingLoginRoute = LandingLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingSignupRoute = LandingSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => LandingRoute,
+} as any)
 const AppRequestsIdRoute = AppRequestsIdRouteImport.update({
   id: '/requests/$id',
   path: '/requests/$id',
@@ -60,29 +65,30 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
   '/history': typeof AppHistoryRoute
   '/new': typeof AppNewRoute
+  '/login': typeof LandingLoginRoute
+  '/signup': typeof LandingSignupRoute
   '/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/': typeof AppIndexRoute
   '/history': typeof AppHistoryRoute
   '/new': typeof AppNewRoute
-  '/': typeof AppIndexRoute
+  '/login': typeof LandingLoginRoute
+  '/signup': typeof LandingSignupRoute
   '/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/_landing': typeof LandingRouteWithChildren
   '/_app/history': typeof AppHistoryRoute
   '/_app/new': typeof AppNewRoute
+  '/_landing/login': typeof LandingLoginRoute
+  '/_landing/signup': typeof LandingSignupRoute
   '/_app/': typeof AppIndexRoute
   '/_app/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -91,28 +97,29 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/signup'
     | '/history'
     | '/new'
+    | '/login'
+    | '/signup'
     | '/requests/$id'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/login'
-    | '/signup'
+    | '/'
     | '/history'
     | '/new'
-    | '/'
+    | '/login'
+    | '/signup'
     | '/requests/$id'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/_app'
-    | '/login'
-    | '/signup'
+    | '/_landing'
     | '/_app/history'
     | '/_app/new'
+    | '/_landing/login'
+    | '/_landing/signup'
     | '/_app/'
     | '/_app/requests/$id'
     | '/api/auth/$'
@@ -120,8 +127,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
+  LandingRoute: typeof LandingRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -134,18 +140,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
+    '/_landing': {
+      id: '/_landing'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -168,6 +167,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/new'
       preLoaderRoute: typeof AppNewRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_landing/login': {
+      id: '/_landing/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LandingLoginRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/signup': {
+      id: '/_landing/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof LandingSignupRouteImport
+      parentRoute: typeof LandingRoute
     }
     '/_app/requests/$id': {
       id: '/_app/requests/$id'
@@ -202,10 +215,22 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface LandingRouteChildren {
+  LandingLoginRoute: typeof LandingLoginRoute
+  LandingSignupRoute: typeof LandingSignupRoute
+}
+
+const LandingRouteChildren: LandingRouteChildren = {
+  LandingLoginRoute: LandingLoginRoute,
+  LandingSignupRoute: LandingSignupRoute,
+}
+
+const LandingRouteWithChildren =
+  LandingRoute._addFileChildren(LandingRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
-  LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
+  LandingRoute: LandingRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

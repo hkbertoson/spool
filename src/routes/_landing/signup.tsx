@@ -1,14 +1,11 @@
-import { Link, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { AuthForm, orThrow } from "../components/AuthForm";
-import { authClient } from "../lib/auth-client";
-import { redirectSchema } from "../lib/workflow";
+import { AuthForm, orThrow } from "../../components/AuthForm";
+import { authClient } from "../../lib/auth-client";
+import { redirectSchema } from "../../lib/workflow";
 
-export const Route = createFileRoute("/signup")({
+export const Route = createFileRoute("/_landing/signup")({
   validateSearch: redirectSchema,
-  beforeLoad: ({ context: { viewer } }) => {
-    if (viewer.user) throw redirect({ to: "/" });
-  },
   head: () => ({ meta: [{ title: "Create account · Print Queue" }] }),
   component: Signup,
 });
@@ -34,7 +31,7 @@ function Signup() {
 
   return (
     <>
-      <h1>Create an account</h1>
+      <h2 className="mt-0">Create an account</h2>
       <AuthForm submitLabel="Create account" onSubmit={signUp}>
         <label>
           Name

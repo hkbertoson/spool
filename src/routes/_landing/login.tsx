@@ -1,14 +1,11 @@
-import { Link, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { AuthForm, orThrow } from "../components/AuthForm";
-import { authClient } from "../lib/auth-client";
-import { redirectSchema } from "../lib/workflow";
+import { AuthForm, orThrow } from "../../components/AuthForm";
+import { authClient } from "../../lib/auth-client";
+import { redirectSchema } from "../../lib/workflow";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/_landing/login")({
   validateSearch: redirectSchema,
-  beforeLoad: ({ context: { viewer } }) => {
-    if (viewer.user) throw redirect({ to: "/" });
-  },
   head: () => ({ meta: [{ title: "Sign in · Print Queue" }] }),
   component: Login,
 });
@@ -29,7 +26,7 @@ function Login() {
 
   return (
     <>
-      <h1>Sign in</h1>
+      <h2 className="mt-0">Sign in</h2>
       <AuthForm submitLabel="Sign in" onSubmit={signIn}>
         <label>
           Email

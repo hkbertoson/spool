@@ -25,6 +25,38 @@
   --shadow-extrude:
     1px 1px 0 var(--color-ink), 2px 2px 0 var(--color-ink), 3px 3px 0 var(--color-ink),
     4px 4px 0 var(--color-ink);
+  --text-shadow-extrude-sm:
+    1px 1px 0 var(--color-ink), 2px 2px 0 var(--color-ink), 3px 3px 0 var(--color-ink);
+  --text-shadow-extrude:
+    1px 1px 0 var(--color-ink), 2px 2px 0 var(--color-ink), 3px 3px 0 var(--color-ink),
+    4px 4px 0 var(--color-ink), 5px 5px 0 var(--color-ink), 6px 6px 0 var(--color-ink);
+
+  /* The landing headline prints bottom-up in 16 layers; the print head rises with it, then parks. */
+  --animate-print-in: print-in 1.6s steps(16) 0.3s both;
+  --animate-print-head:
+    print-head-rise 1.6s steps(16) 0.3s both, print-head-park 0.3s ease-in 1.9s both;
+
+  @keyframes print-in {
+    from {
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+  @keyframes print-head-rise {
+    from {
+      bottom: 0;
+    }
+    to {
+      bottom: 100%;
+    }
+  }
+  @keyframes print-head-park {
+    to {
+      opacity: 0;
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,6 +75,26 @@
 
 @utility grid-cols-label {
   grid-template-columns: max-content 1fr;
+}
+
+/* The viewport minus header and main padding, so centered landing content sits just above optical center. */
+@utility min-h-landing {
+  min-height: calc(100svh - 12rem);
+}
+
+/* Stroke painted under the fill, so it reads as an outside outline like the 2px borders. */
+@utility text-outline {
+  -webkit-text-stroke: 4px var(--color-ink);
+  paint-order: stroke fill;
+}
+
+/* One gap per printed layer; the period matches the 16 steps of print-in and the gap scales with the type. */
+@utility layer-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(6.25% - 0.015em),
+    var(--color-bg) calc(6.25% - 0.015em) 6.25%
+  );
 }
 
 @layer base {
