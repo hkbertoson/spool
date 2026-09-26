@@ -10,6 +10,25 @@ A request board for the home 3D printer. People share a link to a model (Printab
 
 Built with [TanStack Start](https://tanstack.com/start) (React 19, SSR), [Better Auth](https://better-auth.com), Tailwind CSS 4 and Zod, running on Cloudflare Workers with D1. Email goes through Cloudflare Email Sending or [Resend](https://resend.com).
 
+![The board: requests move through Requested, Accepted, Printing and Ready for pickup](docs/screenshots/board.png)
+
+<details>
+<summary>More screenshots</summary>
+
+**A request**, with its progress timeline and comment thread:
+
+![A request page](docs/screenshots/request.png)
+
+**History** of finished, declined and withdrawn requests:
+
+![The history page](docs/screenshots/history.png)
+
+**Sign in**, which doubles as the landing page:
+
+![The sign-in page](docs/screenshots/landing.png)
+
+</details>
+
 ## Features
 
 - **Invite only.** Public sign-up is off (`disableSignUp`). Owners invite people by name and email from the Members page (Better Auth's admin plugin creates the account), and the emailed link lets them choose a password; it lasts 7 days, and after that "Forgot your password?" works too. **Remove** bans rather than deletes, so the person can't sign in but their requests and comments stay. The admin plugin's `owner` role can only create, list and ban users: no impersonation, hard deletes or role changes.
