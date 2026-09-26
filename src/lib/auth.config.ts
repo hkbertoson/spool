@@ -54,7 +54,6 @@ export const authOptions = (env: AuthEnv, sendEmail: (email: Email) => void) =>
       }),
     },
     plugins: [
-      tanstackStartCookies(),
       haveIBeenPwned(),
       // "owner" is granted by hand in D1. Owners can invite, list and remove (ban)
       // members, nothing more: no impersonating, hard deletes or role changes.
@@ -67,5 +66,6 @@ export const authOptions = (env: AuthEnv, sendEmail: (email: Email) => void) =>
         defaultRole: "member",
         bannedUserMessage: "Your access to Spool was removed — ask the printer owner",
       }),
+      tanstackStartCookies(),
     ],
   }) satisfies BetterAuthOptions;
