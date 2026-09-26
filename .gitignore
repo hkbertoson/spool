@@ -5,4 +5,7 @@ dist
 .wrangler
 .dev.vars
 .DS_Store
-.DS_Store
+.env
+.claude/
+.agents/
+skills-lock.json

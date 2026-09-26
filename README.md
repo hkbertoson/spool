@@ -22,7 +22,19 @@ Emails aren't sent locally: the dev server prints each one, with the path of a f
 
 ## Deployment
 
-Live at **https://print-queue.hunterkylebertoson.workers.dev**, on the Cyber Logical Development account (pinned in `wrangler.jsonc`). The D1 database, the `BETTER_AUTH_URL` var and the `BETTER_AUTH_SECRET` secret are already set up. Email goes out through the `EMAIL` binding (Cloudflare Email Sending) from the `EMAIL_FROM` var, which must be on a domain enabled for sending (`npx wrangler email sending list`). The `EMAIL_RATE_LIMIT` binding (Workers Rate Limiting) needs no setup.
+`wrangler.jsonc` holds no account-specific values. If you have more than one Cloudflare account, put `CLOUDFLARE_ACCOUNT_ID=…` in a `.env` file (gitignored). Email goes out through the `EMAIL` binding (Cloudflare Email Sending), so `EMAIL_FROM` must be on a domain enabled for sending (`npx wrangler email sending list`). The `EMAIL_RATE_LIMIT` binding (Workers Rate Limiting) needs no setup.
+
+First deploy:
+
+```sh
+npx wrangler secret put BETTER_AUTH_SECRET   # openssl rand -base64 32
+npx wrangler secret put BETTER_AUTH_URL      # e.g. https://print-queue.<subdomain>.workers.dev
+npx wrangler secret put EMAIL_FROM           # e.g. spool@yourdomain.com
+pnpm build && npx wrangler deploy            # creates the D1 database on first deploy
+pnpm run deploy                              # applies the migrations to it
+```
+
+After that:
 
 ```sh
 pnpm run deploy    # build → apply pending D1 migrations → deploy (plain `pnpm deploy` is a pnpm built-in)
