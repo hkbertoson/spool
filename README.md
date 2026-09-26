@@ -144,7 +144,11 @@ Every page is server-rendered (`ssr: true`). On a request page the ticket render
 
 ## Contributing
 
-Issues and pull requests are welcome. Before opening a PR, run `pnpm lint && pnpm fmt:check && pnpm typecheck && pnpm test`; CI runs the same checks. Schema changes go in a new numbered file in `migrations/`, never in an existing one.
+Issues and pull requests are welcome. Before opening a PR, run `pnpm lint && pnpm fmt:check && pnpm typecheck && pnpm test`; CI runs the same checks. Schema changes go in a new numbered file in `migrations/`, never in an existing one. For a change people will notice, add a changeset with `pnpm changeset`: pick the bump (patch, minor or major) and describe it for users.
+
+## Releases
+
+Changes are recorded in [CHANGELOG.md](CHANGELOG.md) with [Changesets](https://github.com/changesets/changesets). To cut a release, run `pnpm changeset version` on `main`: it bumps `package.json`, rolls the pending `.changeset/*.md` files into the changelog and deletes them. Commit the result, then deploy.
 
 ## License
 
