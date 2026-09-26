@@ -51,7 +51,7 @@
         "description": "The URL for the Better Auth service."
       },
       "EMAIL_FROM": {
-        "description": "Sender address for invites, notifications and password resets, on a domain enabled for Cloudflare Email Sending."
+        "description": "Sender address for invites, notifications and password resets, on a domain verified with your email provider (Cloudflare Email Sending, or Resend if RESEND_API_KEY is set)."
       }
     }
   }

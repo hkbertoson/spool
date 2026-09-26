@@ -18,11 +18,18 @@ pnpm typecheck && pnpm test
 
 `pnpm preview` serves the production build locally, also in workerd.
 
-Emails aren't sent locally: the dev server prints each one, with the path of a file holding its text. That's where invite and password-reset links end up.
+Emails aren't sent locally: the dev server prints each one, with the path of a file holding its text. That's where invite and password-reset links end up. With `RESEND_API_KEY` set in `.dev.vars`, they really go out through Resend.
 
 ## Deployment
 
-`wrangler.jsonc` holds no account-specific values. If you have more than one Cloudflare account, put `CLOUDFLARE_ACCOUNT_ID=…` in a `.env` file (gitignored). Email goes out through the `EMAIL` binding (Cloudflare Email Sending), so `EMAIL_FROM` must be on a domain enabled for sending (`npx wrangler email sending list`). The `EMAIL_RATE_LIMIT` binding (Workers Rate Limiting) needs no setup.
+`wrangler.jsonc` holds no account-specific values. If you have more than one Cloudflare account, put `CLOUDFLARE_ACCOUNT_ID=…` in a `.env` file (gitignored). The `EMAIL_RATE_LIMIT` binding (Workers Rate Limiting) needs no setup.
+
+Email goes out through one of two providers, and `EMAIL_FROM` must be on a domain verified with it:
+
+- **Cloudflare Email Sending** (default): the `EMAIL` binding. Check your domain with `npx wrangler email sending list`.
+- **[Resend](https://resend.com)**: set a `RESEND_API_KEY` secret and it's used instead.
+
+Another provider is one more function in `src/lib/mail.server.ts`.
 
 First deploy:
 
@@ -73,7 +80,7 @@ Use `--local` instead of `--remote` for local dev. Role changes take effect on t
 | `src/lib/requests.functions.ts`             | `createServerFn`s: the only way into data. Every one checks the session (`requireUser` / `requireOwner` middleware)                       |
 | `src/lib/requests.server.ts`                | SQL over D1. Status changes are a single conditional `UPDATE` plus an event row in one batch, so double-clicks and races can't skip steps |
 | `src/lib/notifications.server.ts`           | Who gets which email: one query per event, whose joins are the recipient rules                                                            |
-| `src/lib/mail.server.ts`                    | Sends through the `EMAIL` binding after the response (`waitUntil`), logging failures                                                      |
+| `src/lib/mail.server.ts`                    | Sends through Resend or the `EMAIL` binding after the response (`waitUntil`), logging failures                                            |
 | `src/lib/auth.config.ts`                    | Better Auth options (invite only, admin plugin roles, reset email, rate limit hook), free of Worker imports                               |
 | `src/lib/auth.server.ts`, `store.server.ts` | Bind those to the Worker's `env` (`cloudflare:workers`); `auth.server.ts` also sends invites                                              |
 | `src/routes/_app.tsx`                       | Pathless layout that sends signed-out visitors to `/login`                                                                                |
