@@ -12,13 +12,13 @@ export const orThrow = async <T,>(call: Promise<{ error: { message?: string } | 
   return result;
 };
 
-export function AuthForm({
+export function AuthForm<T>({
   submitLabel,
   onSubmit,
   children,
 }: {
   submitLabel: string;
-  onSubmit: (form: FormData) => Promise<unknown>;
+  onSubmit: (form: FormData) => Promise<T>;
   children: ReactNode;
 }) {
   const { pending, error, run } = useAction();

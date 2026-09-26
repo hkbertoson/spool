@@ -11,15 +11,18 @@ export function useAction() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
 
-  const run = async (mutation: () => Promise<unknown>) => {
+  const run = async <T>(mutation: () => Promise<T>) => {
     setPending(true);
     setError(undefined);
+
     try {
       await mutation();
       await router.invalidate({ sync: true });
+
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
+
       return false;
     } finally {
       setPending(false);

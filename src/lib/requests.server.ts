@@ -11,8 +11,8 @@ import {
 
 type Statement = {
   bind(...values: unknown[]): Statement;
-  all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
-  first<T = Record<string, unknown>>(): Promise<T | null>;
+  all<T>(): Promise<{ results: T[] }>;
+  first<T>(): Promise<T | null>;
   run(): Promise<{ meta: { changes: number } }>;
 };
 

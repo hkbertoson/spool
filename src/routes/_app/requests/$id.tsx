@@ -29,6 +29,7 @@ export const Route = createFileRoute("/_app/requests/$id")({
     if (!requestIdSchema.safeParse({ id }).success) throw notFound();
     const comments = fetchComments({ data: { id } });
     const { request, events } = await fetchRequest({ data: { id } });
+
     return { request, events, comments };
   },
   head: ({ loaderData }) => ({
@@ -148,11 +149,13 @@ function Actions({ id, status, mine }: { id: string; status: Status; mine: boole
   const onDecline = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const reason = String(new FormData(event.currentTarget).get("reason") ?? "");
+
     if (await run(() => decline({ data: { id, reason } }))) setDeclining(false);
   };
 
   const ownerActions = owner && (nextLabel || canDecline(status));
   const withdrawable = (mine || owner) && canWithdraw(status);
+
   if (!ownerActions && !withdrawable) return null;
 
   return (
@@ -221,6 +224,7 @@ function CommentForm({ id }: { id: string }) {
     event.preventDefault();
     const formElement = event.currentTarget;
     const body = String(new FormData(formElement).get("body") ?? "");
+
     if (await run(() => comment({ data: { id, body } }))) formElement.reset();
   };
 

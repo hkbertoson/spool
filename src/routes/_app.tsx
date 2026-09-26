@@ -5,6 +5,7 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/_app")({
   beforeLoad: ({ context: { viewer }, location }) => {
     if (!viewer.user) throw redirect({ to: "/login", search: { redirect: location.href } });
+
     return { user: viewer.user };
   },
   component: Outlet,

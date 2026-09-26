@@ -12,9 +12,12 @@ const migrationsDir = new URL("../../migrations/", import.meta.url);
 export function createTestDb() {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec("pragma foreign_keys = on");
+
   for (const file of readdirSync(migrationsDir).sort())
     sqlite.exec(readFileSync(new URL(file, migrationsDir), "utf8"));
 
+  // SAFETY: the store only binds SQL scalars (undefined becomes null), and callers name
+  // the row type of their own query, as they do against D1.
   const statement = (query: string, values: SQLInputValue[] = []) => ({
     bind: (...next: unknown[]) =>
       statement(query, next.map((v) => (v === undefined ? null : v)) as SQLInputValue[]),
@@ -28,10 +31,13 @@ export function createTestDb() {
     // Like D1's batch: sequential statements in one transaction.
     batch: async (statements) => {
       sqlite.exec("begin");
+
       try {
         const results = [];
+
         for (const s of statements) results.push(await s.run());
         sqlite.exec("commit");
+
         return results;
       } catch (error) {
         sqlite.exec("rollback");

@@ -6,6 +6,7 @@ import { button, panel } from "./ui";
 
 export function ErrorView({ error }: ErrorComponentProps) {
   const router = useRouter();
+
   return (
     <div className={panel}>
       <ErrorComponent error={error} />

@@ -32,16 +32,21 @@ function Board() {
   // The card lands in its new column right away; if the server refuses, it snaps back when the transition ends.
   const [board, applyMove] = useOptimistic(columns, (current, { id, from, to }: Move) => {
     const card = current.find((c) => c.status === from)?.requests.find((r) => r.id === id);
+
     if (!card) return current;
+
     return current.map((column) => {
       if (column.status === from)
         return { ...column, requests: column.requests.filter((r) => r.id !== id) };
+
       if (column.status === to) {
         const requests = [...column.requests, { ...card, status: to }].sort((a, b) =>
           a.createdAt.localeCompare(b.createdAt),
         );
+
         return { ...column, requests };
       }
+
       return column;
     });
   });
@@ -54,13 +59,16 @@ function Board() {
   };
 
   const onDragLeave = (event: DragEvent) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOver(undefined);
+    const leftTo = event.relatedTarget;
+
+    if (!(leftTo instanceof Node && event.currentTarget.contains(leftTo))) setOver(undefined);
   };
 
   const onDrop = (event: DragEvent, to: ActiveStatus) => {
     event.preventDefault();
     setOver(undefined);
     const card = dragging.current;
+
     if (!card || card.from === to) return;
     startTransition(async () => {
       applyMove({ ...card, to });

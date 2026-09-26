@@ -87,6 +87,7 @@ function Filters() {
       search: historySearchSchema.parse(Object.fromEntries(new FormData(event.currentTarget))),
     });
   };
+
   const submitOnChange = (event: FormEvent<HTMLSelectElement>) =>
     event.currentTarget.form?.requestSubmit();
 

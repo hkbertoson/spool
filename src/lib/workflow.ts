@@ -49,10 +49,10 @@ export const declinableStatuses = ["requested", "accepted"] as const;
 export const withdrawableStatuses = ["requested", "accepted", "declined"] as const;
 
 export const canDecline = (status: Status) =>
-  (declinableStatuses as readonly Status[]).includes(status);
+  declinableStatuses.some((declinable) => declinable === status);
 
 export const canWithdraw = (status: Status) =>
-  (withdrawableStatuses as readonly Status[]).includes(status);
+  withdrawableStatuses.some((withdrawable) => withdrawable === status);
 
 export const newRequestSchema = z
   .object({
