@@ -27,7 +27,7 @@ Emails aren't sent locally: the dev server prints each one, with the path of a f
 Email goes out through one of two providers, and `EMAIL_FROM` must be on a domain verified with it:
 
 - **Cloudflare Email Sending** (default): the `EMAIL` binding. Check your domain with `npx wrangler email sending list`.
-- **[Resend](https://resend.com)**: set a `RESEND_API_KEY` secret and it's used instead.
+- **[Resend](https://resend.com)**: set a `RESEND_API_KEY` secret and it's used instead. Without Cloudflare Email Service you can then delete the `send_email` block from `wrangler.jsonc`.
 
 Another provider is one more function in `src/lib/mail.server.ts`.
 
