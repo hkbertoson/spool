@@ -28,7 +28,7 @@ First deploy:
 
 ```sh
 npx wrangler secret put BETTER_AUTH_SECRET   # openssl rand -base64 32
-npx wrangler secret put BETTER_AUTH_URL      # e.g. https://print-queue.<subdomain>.workers.dev
+npx wrangler secret put BETTER_AUTH_URL      # your Worker's URL, e.g. https://<name>.<subdomain>.workers.dev
 npx wrangler secret put EMAIL_FROM           # e.g. spool@yourdomain.com
 pnpm build && npx wrangler deploy            # creates the D1 database on first deploy
 pnpm run deploy                              # applies the migrations to it
@@ -43,14 +43,14 @@ pnpm run deploy    # build → apply pending D1 migrations → deploy (plain `pn
 Spool is invite only: owners invite people from the **Members** page. Make an existing member a printer owner:
 
 ```sh
-npx wrangler d1 execute print-queue --remote \
+npx wrangler d1 execute DB --remote \
   --command "UPDATE \"user\" SET role = 'owner' WHERE email = 'you@example.com'"
 ```
 
 On a fresh database there's nobody to send the first invite, so add the first owner by hand, then use **Forgot your password?** on the sign-in page to set their password:
 
 ```sh
-npx wrangler d1 execute print-queue --remote --command "INSERT INTO \"user\" (id, name, email, emailVerified, createdAt, updatedAt, role) VALUES (lower(hex(randomblob(16))), 'Your Name', 'you@example.com', 1, datetime('now'), datetime('now'), 'owner')"
+npx wrangler d1 execute DB --remote --command "INSERT INTO \"user\" (id, name, email, emailVerified, createdAt, updatedAt, role) VALUES (lower(hex(randomblob(16))), 'Your Name', 'you@example.com', 1, datetime('now'), datetime('now'), 'owner')"
 ```
 
 Use `--local` instead of `--remote` for local dev. Role changes take effect on their next page load.
