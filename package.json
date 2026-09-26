@@ -41,6 +41,7 @@
     "vitest": "^5.0.1",
     "wrangler": "^4.139.0"
   },
+  "packageManager": "pnpm@12.5.1",
   "cloudflare": {
     "bindings": {
       "BETTER_AUTH_SECRET": {
