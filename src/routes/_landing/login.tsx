@@ -38,10 +38,9 @@ function Login() {
         </label>
       </AuthForm>
       <p className="text-muted">
-        New here?{" "}
-        <Link to="/signup" search={{ redirect: next }}>
-          Create an account
-        </Link>
+        New here? Spool is invite only — ask the printer owner.
+        <br />
+        Forgot your password? <Link to="/forgot-password">Reset it</Link>
       </p>
     </>
   );

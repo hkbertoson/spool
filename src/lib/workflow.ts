@@ -1,14 +1,19 @@
 import { z } from "zod";
 
 export const activeStatuses = ["requested", "accepted", "printing", "ready"] as const;
+
 export const archivedStatuses = ["done", "declined", "withdrawn"] as const;
+
 export const materials = ["Any", "PLA", "PETG", "TPU", "ABS", "ASA"] as const;
+
 export const periods = ["7d", "30d", "all"] as const;
 
 export const statuses = [...activeStatuses, ...archivedStatuses] as const;
 
 export type Status = (typeof statuses)[number];
+
 export type ActiveStatus = (typeof activeStatuses)[number];
+
 export type Material = (typeof materials)[number];
 
 export const statusLabels: Record<Status, string> = {
@@ -37,12 +42,15 @@ export const advanceLabels: Partial<Record<Status, string>> = {
 };
 
 export const nextStatus = (status: Status) => nextStatuses[status];
+
 export const declinableStatuses = ["requested", "accepted"] as const;
+
 // Once it's on the bed it's too late to withdraw.
 export const withdrawableStatuses = ["requested", "accepted", "declined"] as const;
 
 export const canDecline = (status: Status) =>
   (declinableStatuses as readonly Status[]).includes(status);
+
 export const canWithdraw = (status: Status) =>
   (withdrawableStatuses as readonly Status[]).includes(status);
 
@@ -92,6 +100,13 @@ export const commentSchema = requestIdSchema.extend({
   body: z.string().trim().min(1).max(2000),
 });
 
+export const inviteSchema = z.object({
+  name: z.string().trim().min(1, "Give their name").max(40),
+  email: z.email("That email doesn't look right").max(254),
+});
+
+export const memberIdSchema = z.object({ id: z.string().min(1).max(64) });
+
 // Only same-site paths, so /login?redirect=//evil.example (or /\evil.example, which
 // browsers treat the same) can't bounce users off-site.
 export const redirectSchema = z.object({
@@ -101,6 +116,10 @@ export const redirectSchema = z.object({
     .optional()
     .catch(undefined),
 });
+
+// Better Auth's emailed link lands here with ?token=…, or with ?error=INVALID_TOKEN
+// (and no token) once it has expired or been used.
+export const resetTokenSchema = z.object({ token: z.string().optional().catch(undefined) });
 
 // URL input is untrusted: bad values fall back instead of throwing.
 export const historySearchSchema = z.object({

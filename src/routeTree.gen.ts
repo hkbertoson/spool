@@ -13,9 +13,11 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as LandingRouteImport } from './routes/_landing'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppHistoryRouteImport } from './routes/_app/history'
+import { Route as AppMembersRouteImport } from './routes/_app/members'
 import { Route as AppNewRouteImport } from './routes/_app/new'
+import { Route as LandingForgotPasswordRouteImport } from './routes/_landing/forgot-password'
 import { Route as LandingLoginRouteImport } from './routes/_landing/login'
-import { Route as LandingSignupRouteImport } from './routes/_landing/signup'
+import { Route as LandingResetPasswordRouteImport } from './routes/_landing/reset-password'
 import { Route as AppRequestsIdRouteImport } from './routes/_app/requests/$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -37,19 +39,29 @@ const AppHistoryRoute = AppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMembersRoute = AppMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppNewRoute = AppNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => AppRoute,
+} as any)
+const LandingForgotPasswordRoute = LandingForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => LandingRoute,
 } as any)
 const LandingLoginRoute = LandingLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => LandingRoute,
 } as any)
-const LandingSignupRoute = LandingSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
+const LandingResetPasswordRoute = LandingResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => LandingRoute,
 } as any)
 const AppRequestsIdRoute = AppRequestsIdRouteImport.update({
@@ -66,18 +78,22 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/history': typeof AppHistoryRoute
+  '/members': typeof AppMembersRoute
   '/new': typeof AppNewRoute
+  '/forgot-password': typeof LandingForgotPasswordRoute
   '/login': typeof LandingLoginRoute
-  '/signup': typeof LandingSignupRoute
+  '/reset-password': typeof LandingResetPasswordRoute
   '/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/history': typeof AppHistoryRoute
+  '/members': typeof AppMembersRoute
   '/new': typeof AppNewRoute
+  '/forgot-password': typeof LandingForgotPasswordRoute
   '/login': typeof LandingLoginRoute
-  '/signup': typeof LandingSignupRoute
+  '/reset-password': typeof LandingResetPasswordRoute
   '/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -86,9 +102,11 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_landing': typeof LandingRouteWithChildren
   '/_app/history': typeof AppHistoryRoute
+  '/_app/members': typeof AppMembersRoute
   '/_app/new': typeof AppNewRoute
+  '/_landing/forgot-password': typeof LandingForgotPasswordRoute
   '/_landing/login': typeof LandingLoginRoute
-  '/_landing/signup': typeof LandingSignupRoute
+  '/_landing/reset-password': typeof LandingResetPasswordRoute
   '/_app/': typeof AppIndexRoute
   '/_app/requests/$id': typeof AppRequestsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -98,18 +116,22 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/history'
+    | '/members'
     | '/new'
+    | '/forgot-password'
     | '/login'
-    | '/signup'
+    | '/reset-password'
     | '/requests/$id'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/history'
+    | '/members'
     | '/new'
+    | '/forgot-password'
     | '/login'
-    | '/signup'
+    | '/reset-password'
     | '/requests/$id'
     | '/api/auth/$'
   id:
@@ -117,9 +139,11 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_landing'
     | '/_app/history'
+    | '/_app/members'
     | '/_app/new'
+    | '/_landing/forgot-password'
     | '/_landing/login'
-    | '/_landing/signup'
+    | '/_landing/reset-password'
     | '/_app/'
     | '/_app/requests/$id'
     | '/api/auth/$'
@@ -161,12 +185,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/members': {
+      id: '/_app/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof AppMembersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/new': {
       id: '/_app/new'
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof AppNewRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_landing/forgot-password': {
+      id: '/_landing/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof LandingForgotPasswordRouteImport
+      parentRoute: typeof LandingRoute
     }
     '/_landing/login': {
       id: '/_landing/login'
@@ -175,11 +213,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingLoginRouteImport
       parentRoute: typeof LandingRoute
     }
-    '/_landing/signup': {
-      id: '/_landing/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof LandingSignupRouteImport
+    '/_landing/reset-password': {
+      id: '/_landing/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof LandingResetPasswordRouteImport
       parentRoute: typeof LandingRoute
     }
     '/_app/requests/$id': {
@@ -201,6 +239,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppHistoryRoute: typeof AppHistoryRoute
+  AppMembersRoute: typeof AppMembersRoute
   AppNewRoute: typeof AppNewRoute
   AppIndexRoute: typeof AppIndexRoute
   AppRequestsIdRoute: typeof AppRequestsIdRoute
@@ -208,6 +247,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppHistoryRoute: AppHistoryRoute,
+  AppMembersRoute: AppMembersRoute,
   AppNewRoute: AppNewRoute,
   AppIndexRoute: AppIndexRoute,
   AppRequestsIdRoute: AppRequestsIdRoute,
@@ -216,13 +256,15 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface LandingRouteChildren {
+  LandingForgotPasswordRoute: typeof LandingForgotPasswordRoute
   LandingLoginRoute: typeof LandingLoginRoute
-  LandingSignupRoute: typeof LandingSignupRoute
+  LandingResetPasswordRoute: typeof LandingResetPasswordRoute
 }
 
 const LandingRouteChildren: LandingRouteChildren = {
+  LandingForgotPasswordRoute: LandingForgotPasswordRoute,
   LandingLoginRoute: LandingLoginRoute,
-  LandingSignupRoute: LandingSignupRoute,
+  LandingResetPasswordRoute: LandingResetPasswordRoute,
 }
 
 const LandingRouteWithChildren =

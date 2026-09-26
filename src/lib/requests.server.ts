@@ -39,16 +39,23 @@ export type PrintRequest = {
 };
 
 export type RequestEvent = { status: Status; at: string; actorName: string };
+
 export type Comment = { body: string; at: string; authorName: string; fromOwner: boolean };
+
 export type Actor = { id: string; owner: boolean };
+
+export type Member = { id: string; name: string; email: string; owner: boolean; joined: boolean };
 
 export class RequestError extends Error {}
 
 const DAY = 24 * 60 * 60 * 1000;
+
 const periodMs = { "7d": 7 * DAY, "30d": 30 * DAY, all: Infinity };
 
 const SELECT_REQUEST = `select r.*, u.name as requesterName from print_request r join "user" u on u.id = r.requesterId`;
+
 const placeholders = (values: readonly unknown[]) => values.map(() => "?").join(", ");
+
 const escapeLike = (text: string) => text.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 export function createRequestStore(db: Db) {
@@ -59,6 +66,7 @@ export function createRequestStore(db: Db) {
   // written if the UPDATE matched (changes() = 1), in a single D1 batch.
   // Returns false when the guard didn't match, so callers can say why.
   type Clause = { sql: string; values: unknown[] };
+
   const transition = async (
     id: string,
     to: Status,
@@ -67,6 +75,7 @@ export function createRequestStore(db: Db) {
     set: Clause = { sql: "", values: [] },
   ) => {
     const at = new Date().toISOString();
+
     const [update] = await db.batch([
       db
         .prepare(
@@ -79,12 +88,15 @@ export function createRequestStore(db: Db) {
         )
         .bind(id, to, actorId, at),
     ]);
+
     return update!.meta.changes === 1;
   };
 
   const mustGet = async (id: string) => {
     const request = await get(id);
+
     if (!request) throw new RequestError("Request not found");
+
     return request;
   };
 
@@ -109,6 +121,7 @@ export function createRequestStore(db: Db) {
         )
         .bind(...activeStatuses)
         .all<PrintRequest>();
+
       return activeStatuses.map((status) => ({
         status,
         requests: results.filter((r) => r.status === status),
@@ -118,28 +131,34 @@ export function createRequestStore(db: Db) {
     history: async ({ status, material, q, period }: HistorySearch, now = Date.now()) => {
       const where = [`r.status in (${placeholders(archivedStatuses)})`];
       const values: unknown[] = [...archivedStatuses];
+
       if (status) {
         where.push("r.status = ?");
         values.push(status);
       }
+
       if (material) {
         where.push("r.material = ?");
         values.push(material);
       }
+
       if (q) {
         where.push(`(r.title like ? escape '\\' or u.name like ? escape '\\')`);
         values.push(`%${escapeLike(q)}%`, `%${escapeLike(q)}%`);
       }
+
       if (period !== "all") {
         where.push("r.updatedAt >= ?");
         values.push(new Date(now - periodMs[period]).toISOString());
       }
+
       const { results } = await db
         .prepare(
           `${SELECT_REQUEST} where ${where.join(" and ")} order by r.updatedAt desc limit 200`,
         )
         .bind(...values)
         .all<PrintRequest>();
+
       return results;
     },
 
@@ -168,12 +187,15 @@ export function createRequestStore(db: Db) {
           .prepare("insert into request_event (requestId, status, actorId, at) values (?, ?, ?, ?)")
           .bind(id, "requested", requesterId, at),
       ]);
+
       return id;
     },
 
     advance: async (id: string, from: Status, actor: Actor) => {
       const to = nextStatus(from);
+
       if (!to) throw new RequestError(`"${statusLabels[from]}" is the last step`);
+
       if (await transition(id, to, actor.id, { sql: "status = ?", values: [from] })) return;
       const request = await mustGet(id);
       throw new RequestError(`Already moved to "${statusLabels[request.status]}" — refresh`);
@@ -190,6 +212,7 @@ export function createRequestStore(db: Db) {
         sql: `status in (${placeholders(declinableStatuses)})`,
         values: [...declinableStatuses],
       };
+
       if (
         await transition(id, "declined", actor.id, where, {
           sql: ", declineReason = ?",
@@ -209,8 +232,10 @@ export function createRequestStore(db: Db) {
         sql: `status in (${placeholders(withdrawableStatuses)}) and (requesterId = ? or ?)`,
         values: [...withdrawableStatuses, actor.id, actor.owner ? 1 : 0],
       };
+
       if (await transition(id, "withdrawn", actor.id, where)) return;
       const request = await mustGet(id);
+
       if (!actor.owner && request.requesterId !== actor.id)
         throw new RequestError("Only the person who asked for it can withdraw it");
       throw new RequestError("Too late to withdraw — it is already on the printer");
@@ -223,6 +248,7 @@ export function createRequestStore(db: Db) {
         )
         .bind(id)
         .all<Omit<Comment, "fromOwner"> & { fromOwner: number }>();
+
       return results.map((c) => ({ ...c, fromOwner: c.fromOwner === 1 }));
     },
 
@@ -233,7 +259,20 @@ export function createRequestStore(db: Db) {
         )
         .bind(id, authorId, body, new Date().toISOString(), id)
         .run();
+
       if (meta.changes !== 1) throw new RequestError("Request not found");
+    },
+
+    // Removed members are banned rather than deleted, so their requests and
+    // comments stay; they drop off this list. "joined" = has set a password.
+    members: async () => {
+      const { results } = await db
+        .prepare(
+          `select u.id, u.name, u.email, u.role = 'owner' as owner, exists (select 1 from account a where a.userId = u.id and a.password is not null) as joined from "user" u where not coalesce(u.banned, 0) order by u.name`,
+        )
+        .all<Omit<Member, "owner" | "joined"> & { owner: number; joined: number }>();
+
+      return results.map((m) => ({ ...m, owner: m.owner === 1, joined: m.joined === 1 }));
     },
   };
 }

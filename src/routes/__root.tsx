@@ -62,7 +62,7 @@ function RootDocument({ children }: { children: ReactNode }) {
 }
 
 function Layout() {
-  const { user } = useViewer();
+  const { user, owner } = useViewer();
 
   return (
     <>
@@ -93,6 +93,11 @@ function Layout() {
                 <Link to="/history" activeOptions={{ includeSearch: false }} className={navTab}>
                   History
                 </Link>
+                {owner && (
+                  <Link to="/members" className={navTab}>
+                    Members
+                  </Link>
+                )}
               </nav>
               <Account />
               <Link to="/new" className={`${button.primary} max-lg:ml-auto`}>

@@ -1,13 +1,33 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "print-queue",
-  "account_id": "8dd478875c821f95cef502ecad3d027b", // Cyber Logical Development
+  "account_id": "8dd478875c821f95cef502ecad3d027b",
   "compatibility_date": "2026-09-20",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
-  "observability": { "enabled": true },
+  "observability": {
+    "enabled": true,
+  },
   // Overridden to localhost in .dev.vars so local sign-in passes Better Auth's origin check.
-  "vars": { "BETTER_AUTH_URL": "https://print-queue.hunterkylebertoson.workers.dev" },
+  "vars": {
+    "BETTER_AUTH_URL": "https://print-queue.hunterkylebertoson.workers.dev",
+    // Must be on a domain enabled for Email Sending (`wrangler email sending list`).
+    "EMAIL_FROM": "spool@hkb.gg",
+  },
+  "send_email": [
+    {
+      "name": "EMAIL",
+    },
+  ],
+  // Emails anyone can request for an address (reset and confirmation links), per address.
+  // namespace_id is any integer not used by another rate limiter on the account.
+  "ratelimits": [
+    {
+      "name": "EMAIL_RATE_LIMIT",
+      "namespace_id": "7731",
+      "simple": { "limit": 2, "period": 60 },
+    },
+  ],
   "d1_databases": [
     {
       "binding": "DB",
@@ -16,5 +36,4 @@
       "migrations_dir": "migrations",
     },
   ],
-  // Secrets (wrangler secret put): BETTER_AUTH_SECRET, SIGNUP_CODE
 }

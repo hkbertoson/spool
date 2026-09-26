@@ -1,4 +1,2 @@
-# Local secrets for `pnpm dev` / `pnpm preview`. Production: `wrangler secret put <NAME>`.
 BETTER_AUTH_SECRET=generate-with-openssl-rand-base64-32
-SIGNUP_CODE=choose-an-office-code
 BETTER_AUTH_URL=http://localhost:3000

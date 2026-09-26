@@ -2,13 +2,19 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { NewRequest } from "./workflow";
 
+import { createNotifier } from "./notifications.server";
 import { RequestError, createRequestStore } from "./requests.server";
 import { createTestDb } from "./test-db";
 import { historySearchSchema, moveSchema, newRequestSchema, redirectSchema } from "./workflow";
 
 let store: ReturnType<typeof createRequestStore>;
+
+let notifier: ReturnType<typeof createNotifier>;
+
 const sam = { id: "u-sam", owner: false };
+
 const riley = { id: "u-riley", owner: false };
+
 const owner = { id: "u-owner", owner: true };
 
 beforeEach(() => {
@@ -17,6 +23,7 @@ beforeEach(() => {
   addUser(riley.id, "Riley");
   addUser(owner.id, "Pat", "owner");
   store = createRequestStore(db);
+  notifier = createNotifier(db, "https://spool.test");
 });
 
 const input: NewRequest = {
@@ -54,6 +61,7 @@ describe("create", () => {
 describe("workflow", () => {
   it("moves forward one step at a time and records who did it", async () => {
     const id = await store.create(input, sam.id);
+
     for (const from of ["requested", "accepted", "printing", "ready"] as const)
       await store.advance(id, from, owner);
     expect(await statusOf(id)).toBe("done");
@@ -185,6 +193,39 @@ describe("board and history", () => {
   });
 });
 
+describe("members", () => {
+  it("flags owners, marks invites pending until a password is set, and hides removed members", async () => {
+    const { db, addUser } = createTestDb();
+    addUser("u-pat", "Pat", "owner");
+    addUser("u-sam", "Sam");
+    addUser("u-nia", "Nia");
+    addUser("u-gus", "Gus");
+
+    for (const userId of ["u-pat", "u-sam"])
+      await db
+        .prepare(
+          "insert into account (id, accountId, providerId, userId, password, createdAt, updatedAt) values (?, ?, 'credential', ?, 'hash', '', '')",
+        )
+        .bind(`a-${userId}`, userId, userId)
+        .run();
+    await db.prepare('update "user" set banned = 1 where id = ?').bind("u-gus").run();
+
+    const member = (id: string, name: string, owner: boolean, joined: boolean) => ({
+      id,
+      name,
+      email: `${id}@example.test`,
+      owner,
+      joined,
+    });
+
+    expect(await createRequestStore(db).members()).toEqual([
+      member("u-nia", "Nia", false, false),
+      member("u-pat", "Pat", true, true),
+      member("u-sam", "Sam", false, true),
+    ]);
+  });
+});
+
 describe("comments", () => {
   it("appends to the thread, flags the owner, and rejects unknown requests", async () => {
     const id = await store.create(input, sam.id);
@@ -199,6 +240,63 @@ describe("comments", () => {
       expect.objectContaining({ authorName: "Pat", fromOwner: true, body: "Yes" }),
     ]);
     await expect(store.addComment("zzzzzzzz", sam.id, "hi")).rejects.toThrow("not found");
+  });
+});
+
+describe("notifications", () => {
+  const recipients = (emails: { to: string }[]) => emails.map((email) => email.to).sort();
+
+  it("tells the owners about new requests, except their own", async () => {
+    const id = await store.create(input, sam.id);
+    expect(await notifier.requested(id)).toEqual([
+      {
+        to: "u-owner@example.test",
+        subject: "New request: Cable clip",
+        text: `Sam requested "Cable clip" (PETG, black, ×4).\n\nhttps://www.printables.com/model/12345-cable-clip\n\nOpen in Spool: https://spool.test/requests/${id}`,
+      },
+    ]);
+    expect(await notifier.requested(await store.create(input, owner.id))).toEqual([]);
+  });
+
+  it("tells the requester when someone else moves their print along", async () => {
+    const id = await store.create(input, sam.id);
+    const sent = [];
+
+    for (const from of ["requested", "accepted", "printing", "ready"] as const) {
+      await store.advance(id, from, owner);
+      sent.push(...(await notifier.statusChanged(id, owner.id)));
+    }
+
+    // Being picked up isn't news to the person who picked it up.
+    expect(sent.map((email) => `${email.to} ${email.subject}`)).toEqual([
+      "u-sam@example.test Accepted: Cable clip",
+      "u-sam@example.test Printing: Cable clip",
+      "u-sam@example.test Ready for pickup: Cable clip",
+    ]);
+
+    const declined = await store.create(input, sam.id);
+    await store.decline(declined, "Out of PETG", owner);
+    expect((await notifier.statusChanged(declined, owner.id))[0]?.text).toContain(
+      "Reason: Out of PETG",
+    );
+
+    const own = await store.create(input, owner.id);
+    await store.advance(own, "requested", owner);
+    expect(await notifier.statusChanged(own, owner.id)).toEqual([]);
+  });
+
+  it("sends comments to the requester and owners, except the author", async () => {
+    const id = await store.create(input, sam.id);
+    expect(recipients(await notifier.commented(id, sam.id, "By Friday?"))).toEqual([
+      "u-owner@example.test",
+    ]);
+    expect(recipients(await notifier.commented(id, owner.id, "Yes"))).toEqual([
+      "u-sam@example.test",
+    ]);
+    expect(recipients(await notifier.commented(id, riley.id, "Me too"))).toEqual([
+      "u-owner@example.test",
+      "u-sam@example.test",
+    ]);
   });
 });
 
@@ -264,6 +362,7 @@ describe("schemas", () => {
 
   it("only allows same-site login redirects", () => {
     expect(redirectSchema.parse({ redirect: "/history?q=clip" }).redirect).toBe("/history?q=clip");
+
     for (const redirect of ["//evil.example", "/\\evil.example", "https://evil.example", "evil"]) {
       expect(redirectSchema.parse({ redirect }).redirect, redirect).toBeUndefined();
     }
