@@ -2,6 +2,8 @@
 
 [![Built with Cloudflare](https://workers.cloudflare.com/built-with-cloudflare.svg)](https://cloudflare.com)
 
+[![CI](https://github.com/hkbertoson/spool/actions/workflows/ci.yml/badge.svg)](https://github.com/hkbertoson/spool/actions/workflows/ci.yml)
+
 [![License: MIT](https://shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 
 A request board for the home 3D printer. People share a link to a model (Printables, MakerWorld, Thingiverse…) or describe an idea, then follow it through **Requested → Accepted → Printing → Ready for pickup**.
