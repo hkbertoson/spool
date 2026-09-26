@@ -47,13 +47,19 @@
   "cloudflare": {
     "bindings": {
       "BETTER_AUTH_SECRET": {
-        "description": "Generate a random string using `openssl rand -base64 32`."
+        "description": "Signs sessions. Generate a random string with `openssl rand -base64 32`."
       },
       "BETTER_AUTH_URL": {
-        "description": "The URL for the Better Auth service."
+        "description": "The Worker's public URL: `https://<worker name>.<your subdomain>.workers.dev`, using the Worker name chosen on this page, or your custom domain."
       },
       "EMAIL_FROM": {
-        "description": "Sender address for invites, notifications and password resets, on a domain verified with your email provider (Cloudflare Email Sending, or Resend if RESEND_API_KEY is set)."
+        "description": "Sender for invites, notifications and password resets, e.g. `spool@yourdomain.com`. Must be on a domain enabled for **Cloudflare Email Sending**, or verified with Resend if you add a `RESEND_API_KEY` secret later."
+      },
+      "EMAIL": {
+        "description": "Cloudflare Email Sending. To use [Resend](https://resend.com) instead, add a `RESEND_API_KEY` secret after deploying."
+      },
+      "DB": {
+        "description": "Holds members, requests and comments. Migrations run on every deploy."
       }
     }
   }

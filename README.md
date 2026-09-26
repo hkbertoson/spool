@@ -6,6 +6,8 @@
 
 [![License: MIT](https://shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/hkbertoson/spool)
+
 A request board for the home 3D printer. People share a link to a model (Printables, MakerWorld, Thingiverse…) or describe an idea, then follow it through **Requested → Accepted → Printing → Ready for pickup**.
 
 Built with [TanStack Start](https://tanstack.com/start) (React 19, SSR), [Better Auth](https://better-auth.com), Tailwind CSS 4 and Zod, running on Cloudflare Workers with D1. Email goes through Cloudflare Email Sending or [Resend](https://resend.com).
@@ -63,6 +65,14 @@ To sign in locally, create the first owner as described under [First owner](#fir
 ## Deployment
 
 `wrangler.jsonc` holds no account-specific values. If you have more than one Cloudflare account, put `CLOUDFLARE_ACCOUNT_ID=…` in a `.env` file (gitignored). The `EMAIL_RATE_LIMIT` binding (Workers Rate Limiting) needs no setup, and the D1 database is created on the first deploy.
+
+### One-click deploy
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/hkbertoson/spool)
+
+The button copies this repo into your GitHub account, creates the D1 database, asks for the settings below, then builds and deploys with [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), running the migrations as part of `pnpm run deploy`. Every push to your copy's `main` deploys again. Afterwards, add the [first owner](#first-owner). To send email through Resend, add a `RESEND_API_KEY` secret in the Worker's settings.
+
+To deploy by hand instead, read on.
 
 ### Configuration
 
