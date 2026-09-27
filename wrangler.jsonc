@@ -33,7 +33,6 @@
     {
       "binding": "DB",
       "database_id": "df779c65-950c-4db2-a8a8-a17e4032fc80",
-      "database_name": "print-queue",
       "migrations_dir": "migrations",
     },
   ],
