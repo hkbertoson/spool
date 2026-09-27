@@ -3,7 +3,9 @@
   // Resource names predate the Spool rename; renaming the Worker or database would create new ones.
   "name": "print-queue",
   "compatibility_date": "2026-09-20",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "main": "@tanstack/react-start/server-entry",
   "observability": {
     "enabled": true,
@@ -21,12 +23,16 @@
     {
       "name": "EMAIL_RATE_LIMIT",
       "namespace_id": "7731",
-      "simple": { "limit": 2, "period": 60 },
+      "simple": {
+        "limit": 2,
+        "period": 60
+      },
     },
   ],
   "d1_databases": [
     {
       "binding": "DB",
+      "database_id": "df779c65-950c-4db2-a8a8-a17e4032fc80",
       "database_name": "print-queue",
       "migrations_dir": "migrations",
     },
